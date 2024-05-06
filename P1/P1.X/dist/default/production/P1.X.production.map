@@ -1,0 +1,42 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Mon May 06 09:13:51 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000034
+                   .cinit    romdata   0x00001a    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/MAIN.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x00001b      
+                            0x002007    0x002007      
+            29 out of 8454 program addresses used, program memory utilization is 0%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   ARRIBA   0x00000f    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                   BUCLE1   0x000011    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                 PROGRAMA   0x000006    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                  REPITE1   0x000013    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                RETARDO1S   0x00000d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 PROGRAMA   0x000006    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                RETARDO1S   0x00000d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                   ARRIBA   0x00000f    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                   BUCLE1   0x000011    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+                  REPITE1   0x000013    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P1.X\main.asm
+
+
