@@ -1,0 +1,2015 @@
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include "p16f877a.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Jan 06 2020
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2020 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+Warning[205]: Found directive in column 1. (__CONFIG)
+2007   3F32           00002 __CONFIG _FOSC_HS & _WDTE_OFF & _PWRTE_ON & _BOREN_OFF & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+Warning[205]: Found directive in column 1. (LIST)
+                      00003 LIST P=16F877A
+Warning[205]: Found directive in column 1. (INCLUDE)
+                      00004 INCLUDE <mimacro.inc>
+                      00001 ;;: :::::::::::::::::::::: www.rodrigocarita.com ::::::::::::::::::::::::::::::::::::::
+                      00002 ; Macro de comandos y librerï¿½as para el Pic16f877A
+                      00003 ; archivo : mimacro.INC
+                      00004 ; Versiï¿½n : 1.2
+                      00005 ; ------------------------------------------------------------------------------
+  00000005            00006 puertoa EQU PORTA
+  00000006            00007 puertob EQU PORTB
+  00000007            00008 puertoc EQU PORTC
+  00000008            00009 puertod EQU PORTD
+  00000009            00010 puertoe EQU PORTE
+                      00011 ;////////////////////////////////////////////
+                      00012 
+                      00013 encender macro pin,puerto
+                      00014     bsf puerto,pin
+                      00015     endm
+                      00016 apagar macro pin,puerto
+                      00017     bcf puerto,pin
+                      00018     endm
+                      00019 SETF macro registr0
+                      00020         MOVLW d'255'
+                      00021         MOVWF registr0
+Warning[205]: Found directive in column 1. (endm)
+                      00022 endm    
+                      00023 ;...................................................................................................... 
+                      00024 cargarvalor macro valor,registro
+                      00025         MOVLW valor
+                      00026         MOVWF registro
+Warning[205]: Found directive in column 1. (endm)
+                      00027 endm
+                      00028 
+                      00029 copiarregistro macro registrode,registrohacia
+                      00030         MOVF registrode,0
+                      00031         MOVWF registrohacia
+Warning[205]: Found directive in column 1. (endm)
+                      00032 endm
+                      00033 ;.....................................................................................................  
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00034 ;//////////////////////////////////
+                      00035 
+                      00036 banco macro numerobanco
+                      00037 ;banco 0
+                      00038 if numerobanco==0
+                      00039 BCF STATUS, RP0
+                      00040 BCF STATUS, RP1
+                      00041 endif
+                      00042 
+                      00043 if numerobanco==1
+                      00044 ;banco 1
+                      00045 BSF STATUS, RP0
+                      00046 BCF STATUS, RP1
+                      00047 endif
+                      00048 
+                      00049 if numerobanco==2
+                      00050 ;banco 2
+                      00051 BCF STATUS, RP0
+                      00052 BSF STATUS, RP1
+                      00053 endif
+                      00054 
+                      00055 if numerobanco==3
+                      00056 ;banco 3
+                      00057 BSF STATUS, RP0
+                      00058 BSF STATUS, RP1
+                      00059 endif
+                      00060 
+Warning[205]: Found directive in column 1. (endm)
+                      00061 endm
+                      00062 
+                      00063 ;//////////////////////////////////////////// compara entre registros y salta si son iguales /////////
+                      00064 csir             macro  registro1,registro2,direcc
+                      00065                          movf   registro2,0
+                      00066                          subwf  registro1,0
+                      00067                          btfsc  STATUS,Z
+                      00068                          goto   direcc
+Warning[205]: Found directive in column 1. (endm)
+                      00069 endm
+                      00070 
+                      00071 ;//////////////////////////////////////////// compara entre registros y salta si no son iguales ////////
+                            /
+                      00072 csnir            macro  registro1,registro2,direcc
+                      00073                          movf   registro2,0
+                      00074                          subwf  registro1,0
+                      00075                          btfsc  STATUS,Z
+                      00076                          goto   direcc
+Warning[205]: Found directive in column 1. (endm)
+                      00077 endm
+                      00078 
+                      00079 ; Compara registro con un valor y se va a la rutina direccion si son iguales
+                      00080 
+                      00081 csi          macro      registro1,valor,direccion
+                      00082                 movlw   valor
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00083                  subwf  registro1,0
+                      00084                  btfsc  STATUS,Z
+                      00085                  goto   direccion
+Warning[205]: Found directive in column 1. (endm)
+                      00086 endm
+                      00087 
+                      00088 ;Compara registro con un valor y se va a la rutina si no son iguales
+                      00089 csni macro registro1,valor,direccion
+                      00090                         movlw valor
+                      00091                         subwf registro1,0
+                      00092                         btfss STATUS,Z
+                      00093                         goto direccion
+Warning[205]: Found directive in column 1. (endm)
+                      00094 endm
+                      00095 
+                      00096 ; Compara registro con un valor y si  se cumple la condicion Reg>valor se va a la subrutina
+                      00097 mayorque macro registro1,valor ,subrutina
+                      00098                 MOVLW valor
+                      00099                 SUBWF registro1,0
+                      00100                 BTFSC STATUS,C
+                      00101                 GOTO subrutina
+Warning[205]: Found directive in column 1. (endm)
+                      00102 endm
+                      00103 
+                      00104 ; Compara registro con un valor y si  se cumple la condicion Reg<valor se va a la subrutina
+                      00105 menorque macro registro1,valor ,subrutina
+                      00106                 MOVLW valor
+                      00107                 SUBWF registro1,0
+                      00108                 BTFSS STATUS,C
+                      00109                 GOTO subrutina
+Warning[205]: Found directive in column 1. (endm)
+                      00110 endm
+                      00111 
+                      00112 ; Compara registro con un valor y si se cumple la condicion Reg>Reg2se va a la subrutina
+                      00113 mayorquereg macro registro1,registro2 ,subrutina
+                      00114                 MOVF registro2,0
+                      00115                 SUBWF registro1,0
+                      00116                 BTFSC STATUS,C
+                      00117                 GOTO subrutina
+Warning[205]: Found directive in column 1. (endm)
+                      00118 endm
+                      00119 
+                      00120 ; Compara registro con un valor y si se cumple la condicion Reg<Reg2 se va a la subrutina
+                      00121 menorquereg macro registro1,registro2,subrutina
+                      00122                 MOVF registro2,0
+                      00123                 SUBWF registro1,0
+                      00124                 BTFSS STATUS,C
+                      00125                 GOTO subrutina
+Warning[205]: Found directive in column 1. (endm)
+                      00126 endm
+                      00127 
+                      00128 ; /////////////////////////////////// Para display 7 segmentos //////////////////////////////
+                      00129 enviaradisplay macro numnum
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00130         MOVLW numnum
+                      00131         CALL TABLAANODO
+                      00132         MOVWF PORTD
+Warning[205]: Found directive in column 1. (endm)
+                      00133 endm
+                      00134         
+                      00135 enviarcdisplay macro numnum
+                      00136         MOVLW numnum
+                      00137         CALL TABLACATODO
+                      00138         MOVWF PORTD
+Warning[205]: Found directive in column 1. (endm)
+                      00139 endm
+                      00140 
+                      00141 registroadisplay macro numnum
+                      00142         MOVF numnum,0
+                      00143         CALL TABLAANODO
+                      00144         MOVWF PORTD
+Warning[205]: Found directive in column 1. (endm)
+                      00145 endm
+                      00146 
+                      00147 registrocdisplay macro numnum
+                      00148         MOVF numnum,0
+                      00149         CALL TABLACATODO
+                      00150         MOVWF PORTD
+Warning[205]: Found directive in column 1. (endm)
+                      00151 endm
+                      00152 
+                      00153 ;...............................................///////////////////////////////////.....................
+                            ..../////////////////////////
+                      00154 on_lib_retardos_ms macro
+                      00155         CALL CONFTMR0TEMP
+Warning[205]: Found directive in column 1. (endm)
+                      00156 endm
+                      00157 
+                      00158 retardo_ms macro valor
+                      00159         MOVLW valor
+                      00160         CALL RETARDOLIBRE_mS
+Warning[205]: Found directive in column 1. (endm)
+                      00161 endm
+                      00162 
+                      00163 ;Conversor de Binario a BCD. La respuesta se guarda en registros bcd_unidad, bcd_decena, bcd_centena
+                      00164 convertir_a_bcd macro registro
+                      00165         MOVF registro,0
+                      00166         CALL binario_a_bcd
+Warning[205]: Found directive in column 1. (endm)
+                      00167 endm
+                      00168 
+                      00169 ;Codigo de macro para Retardos
+                      00170 milisegundo      macro X
+                      00171                          movlw X
+                      00172                          call  milisegundos
+                      00173                          endm
+                      00174 segundo          macro X
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00175                          movlw X
+                      00176                          call  segundos
+                      00177                          endm
+                      00178 
+                      00179 ;//////////////////////////////////////////////////////////////////////////////
+                      00180 ; Macro para LCD Informaciï¿½n sobre comandos en www.rodrigocarita.com
+                      00181 ; Para controlar la pantalla LCD 2x16
+                      00182 
+                      00183 iniciarlcd macro             ;Con esto desarrollamos la secuencia de inicio               
+                      00184            call  Inicio_lcd
+                      00185            endm
+                      00186 escribir   macro valcaracter       ;Con este comando enviaremos un caracter a la pantalla
+                      00187            movlw valcaracter
+                      00188            call  ESCRIBIRCARACTER  ;Subrutina en la librerï¿½a que me permite enviar el caracter
+                      00189            endm
+                      00190 escribirreg macro registro4                     ;Con este comando enviaremos el valor de un registro a l
+                            a pantalla
+                      00191          movlw .48
+                      00192         addwf registro4,0
+                      00193          call  ESCRIBIRCARACTER   ;Subrutina en la librerï¿½a que me permite enviar el valor
+                      00194            endm
+                      00195 escribirregistro macro regREG3d     ;Subrutina para escribir en el LCD registro de 3 dï¿½gitos
+                      00196                    MOVF regREG3d,0
+                      00197                    CALL PARAESCR1B1RREGISTRO
+Warning[205]: Found directive in column 1. (endm)
+                      00198 endm
+                      00199 escribirmensaje macro
+                      00200                         CLRF indice
+                      00201                         SEcuENCIASUBcar1
+                      00202                         MOVF indice,0
+                      00203                         CALL aasdd
+                      00204                         MOVWF NumCadena
+                      00205                         csi NumCadena,.255,FUERALIM1T3
+                      00206                         MOVF NumCadena,0
+                      00207                         call  ESCRIBIRCARACTER
+                      00208                         INCF indice,1
+                      00209                         GOTO SEcuENCIASUBcar1
+Warning[205]: Found directive in column 1. (endm)
+                      00210 endm               
+                      00211            
+                      00212 ;Aquï¿½ las macros para manipulaciï¿½n del cursor //////////////////////////////////////////
+                      00213 cursor_on macro
+                      00214                 movlw on_display_cursor_blink ;Enciende el cursor y su parpadeo
+                      00215         CALL  ESCRIBIRCOMANDO
+                      00216                 endm
+                      00217 cursor_off macro
+                      00218                 movlw solo_display        ;Apaga el cursor y muestra solamente el display
+                      00219         CALL  ESCRIBIRCOMANDO
+                      00220                 endm
+                      00221 cursor_izquierda macro
+                      00222                 movlw mover_cursor_izquierda ;Mueve el cursor a la derecha
+                      00223         call  ESCRIBIRCOMANDO
+                      00224                 endm
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00225 cursor_derecha macro
+                      00226                 movlw mover_cursor_derecha ;Mueve el cursor a la izquierda
+                      00227         call  ESCRIBIRCOMANDO
+                      00228                 endm
+                      00229            
+                      00230 fila_enter     macro    ;Saltarï¿½ de lï¿½nea a la segunda fila
+                      00231            movlw salto_enter
+                      00232            call  ESCRIBIRCOMANDO
+Warning[205]: Found directive in column 1. (endm)
+                      00233 endm
+                      00234 fila_home macro
+                      00235                 movlw home_inicio
+                      00236                 call ESCRIBIRCOMANDO
+Warning[205]: Found directive in column 1. (endm)
+                      00237 endm
+                      00238 ;//////////////////////////////////////////////////////
+                      00239 ;//////////////////////////////////////// creado para la escritura en LCD mediante textos predeterminado
+                            s.///////////
+                      00240 mensaje macro  x
+                      00241         if x==.1
+                      00242         call SubirCarActer1
+                      00243         endif
+                      00244         if x==.2
+                      00245         call SubirCarActer2
+                      00246         endif
+                      00247                 if x==.3
+                      00248         call SubirCarActer3
+                      00249         endif
+                      00250                 if x==.4
+                      00251         call SubirCarActer4
+                      00252         endif
+                      00253                 if x==.5
+                      00254         call SubirCarActer5
+                      00255         endif
+                      00256                 if x==.6
+                      00257         call SubirCarActer6
+                      00258         endif
+                      00259                 if x>.6
+                      00260                 ERROR "No hay mensaje predeterminado para el valor"
+                      00261                 MESSG "Revisa el comando mensjae .x"
+                      00262                 endif
+                      00263         endm
+                      00264 
+                      00265 ;Se pueden agregar mï¿½s, respetando la estructura de condicionales
+                      00266 
+                      00267 ;/////////////////////////////////////////////////////////////////////////////////////
+                      00268 
+                      00269 
+                      00270 
+                      00271 ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                            \
+                      00272 ;\\\\\\\\\\\\\\\\\\\\\Manipulaciï¿½n del cursor solamente para pantallas de 20x4 ///////////////////////
+                            /////
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00273 ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                      00274 
+                      00275 ir_a_fila macro filaseleccionada
+                      00276 
+                      00277         if filaseleccionada==1
+                      00278                 movlw home_inicio
+                      00279                 call ESCRIBIRCOMANDO
+                      00280         endif
+                      00281         if filaseleccionada==2
+                      00282                 movlw home_inicio
+                      00283                 call ESCRIBIRCOMANDO
+                      00284                 movlw salto_enter
+                      00285         call ESCRIBIRCOMANDO
+                      00286         endif
+                      00287         if filaseleccionada==3
+                      00288                 movlw 0x94
+                      00289                 call ESCRIBIRCOMANDO
+                      00290         endif
+                      00291         if filaseleccionada==4
+                      00292                 movlw 0xD4
+                      00293                 call ESCRIBIRCOMANDO
+                      00294         endif
+                      00295         if filaseleccionada>4
+                      00296                 ERROR "Has sobrepasado la cantidad de filas a usar"
+                      00297                 MESSG "Revisa el comando ir_a_fila que el valor sea"
+                      00298                 MESSG "de 1 a 4 solamente."
+                      00299         endif
+Warning[205]: Found directive in column 1. (endm)
+                      00300 endm
+                      00301 
+                      00302 
+                      00303 ; ///////////////////////Comando adicional /////////////////////////////////////////////////////////////
+                            ///////////
+                      00304 ;/////////////////////////////Para ir a un punto especifico del LCD ////////////////////////////////////
+                            //////////
+                      00305 ;/////////////////////////////////Solo para LCD20x4 ////////////////////////////////////////////////////
+                            //////////
+                      00306 lcdfc macro lcdvalorf,lcdvalorc
+                      00307 
+                      00308         ;/// Para seleccionar la fila
+                      00309         if lcdvalorf==1
+                      00310         MOVLW lcdvalorc
+                      00311         MOVWF ubicacionlcdfcr
+                      00312         DECF ubicacionlcdfcr,1
+                      00313         MOVlW 0X80
+                      00314         ADDWF ubicacionlcdfcr,0
+                      00315         call ESCRIBIRCOMANDO
+                      00316         endif
+                      00317         if lcdvalorf==2
+                      00318         MOVLW lcdvalorc
+                      00319         MOVWF ubicacionlcdfcr
+                      00320         DECF ubicacionlcdfcr,1
+                      00321         MOVlW 0XC0
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00322         ADDWF ubicacionlcdfcr,0
+                      00323         call ESCRIBIRCOMANDO
+                      00324         endif
+                      00325         if lcdvalorf==3
+                      00326         MOVLW lcdvalorc
+                      00327         MOVWF ubicacionlcdfcr
+                      00328         DECF ubicacionlcdfcr,1
+                      00329         MOVlW 0X94
+                      00330         ADDWF ubicacionlcdfcr,0
+                      00331         call ESCRIBIRCOMANDO
+                      00332         endif
+                      00333         if lcdvalorf==4
+                      00334         MOVLW lcdvalorc
+                      00335         MOVWF ubicacionlcdfcr
+                      00336         DECF ubicacionlcdfcr,1
+                      00337         MOVlW 0XD4
+                      00338         ADDWF ubicacionlcdfcr,0
+                      00339         call ESCRIBIRCOMANDO
+                      00340         endif
+                      00341         ;Para seleccionar la columna
+                      00342 
+Warning[205]: Found directive in column 1. (endm)
+                      00343 endm
+                      00344 
+                      00345 ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\               
+                      00346 
+                      00347 ;Desde aquï¿½ los comandos para manipulaciï¿½n del display //////////////////////////////////////////
+Warning[207]: Found label after column 1. (borralcd)
+                      00348  borralcd  macro                ;Borra todo lo de la pantalla
+                      00349            movlw limpiar_lcd
+                      00350            call  ESCRIBIRCOMANDO
+                      00351            endm
+                      00352 borrarfila macro valor
+                      00353         lcdfc valor,.1
+                      00354         CALL subp4arab0rf1l     
+                      00355         lcdfc valor,.1
+Warning[205]: Found directive in column 1. (endm)
+                      00356 endm               
+Warning[207]: Found label after column 1. (desplazaderecha)
+                      00357  desplazaderecha  macro                 ;Mueve todo lo escrito en la pantalla 1 a la derecha
+                      00358                   movlw  mover_pantalla_derecha
+                      00359                   call   ESCRIBIRCOMANDO             
+                      00360                   endm
+Warning[207]: Found label after column 1. (desplazaizquierda)
+                      00361  desplazaizquierda  macro       ;Mueve todo lo escrito en la pantalla 1 a la izquierda         
+                      00362                                 movlw  mover_pantalla_izquierda
+                      00363                                 call   ESCRIBIRCOMANDO             
+                      00364                                 endm
+Warning[207]: Found label after column 1. (apagarpantalla)
+                      00365  apagarpantalla macro
+                      00366                                 movlw apagar_el_display
+                      00367                                 call ESCRIBIRCOMANDO
+                      00368  endm
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[207]: Found label after column 1. (encenderpantalla)
+                      00369   encenderpantalla macro
+                      00370                                 movlw solo_display
+                      00371                                 call ESCRIBIRCOMANDO
+                      00372  endm
+                      00373  
+                      00374  ;/////////////////////////////////////////////////////////////////////////////////
+                      00375  ;/////////////////////////////////////////////////////////////////////////////////
+                      00376  ;Para enviar 1 pulso de duraciï¿½n programable
+                      00377  ;Requiere de la Librerï¿½a RETARDOS.ASM
+                      00378  
+Warning[207]: Found label after column 1. (PULSOSUB)
+                      00379  PULSOSUB macro pinp,registrop,duracion
+                      00380                 BSF registrop,pinp
+                      00381                 milisegundo duracion
+                      00382                 BCF registrop,pinp
+                      00383  endm
+                      00384 
+                      00385  ;///////////////////// Operaciones matemï¿½ticas //////////////////////////////////
+                      00386  ;//////////////////////////////////////////////////////
+                      00387 sumarreg macro registro1,registro2
+                      00388    movf registro1,0
+                      00389    movwf Reg15tr01
+                      00390    movf registro2,0
+                      00391    movwf Reg15tr02
+                      00392    call Separaciondigit05
+                      00393    call ParaSumarReg1str0s
+Warning[205]: Found directive in column 1. (endm)
+                      00394 endm
+                      00395 
+                      00396 restarreg macro registrox1,registrox2; Hay que asegurarse que el registro 1 sea mayor al registro2.
+                      00397    movf registrox1,0
+                      00398    movwf Reg15tr01
+                      00399    movf registrox2,0
+                      00400    movwf Reg15tr02
+                      00401    call ParaRestarReg1str0s2
+Warning[205]: Found directive in column 1. (endm)
+                      00402 endm
+                      00403  
+                      00404 multiplicarreg macro registrom1,registrom2
+                      00405    movf registrom1,0
+                      00406    movwf Reg15tr01
+                      00407    movf registrom2,0
+                      00408    movwf Reg15tr02
+                      00409    call Separaciondigit05
+                      00410    call ParaMultiplicarReg1str0s
+Warning[205]: Found directive in column 1. (endm)
+                      00411 endm 
+                      00412 
+                      00413 crearreg macro registroc1,registroc2,registroc3
+                      00414    movf registroc1,0
+                      00415    movwf Reg15tr01
+                      00416    movf registroc2,0
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00417    movwf Reg15tr02
+                      00418    movf registroc3,0
+                      00419    movwf Reg15tr03
+                      00420    call ParaCrearReg1str0
+Warning[205]: Found directive in column 1. (endm)
+                      00421 endm
+                      00422 
+                      00423 ;///////////////////////////////////////////////////////////////////////////////////////////////////////
+                            /////
+                      00424 ;//////////////////////////////////// Para mï¿½dulo HC-SR04 ////////////////////////////////////////////
+                            ///////
+                      00425 ;///////////////////////////////////////////////////////////////////////////////////////////////////////
+                            /////  
+                      00426 
+                      00427 iniciar_hcsr04  macro
+                      00428         banco 1
+                      00429         MOVLW b'00000111' ; Timer 0 como temporizador y escala 256
+                      00430         MOVWF OPTION_REG  ; Cargamos la configuraciï¿½n en el TMR0
+                      00431         banco 0
+                      00432         BCF TRIGGER
+                      00433         MOVLW .88 ;Cargamos el valor de ajuste de medida 51.2/58 = 0.88
+                      00434          MOVWF Ajust3d1st ;En la variable de ajuste "Ajust3d1st"
+Warning[205]: Found directive in column 1. (endm)
+                      00435 endm
+                      00436 
+                      00437 medir_ultrasonico macro Rresulm3edid4
+                      00438         CALL Med1rdiist4nc1ia  ;Llama a la subrutina de mediciï¿½n
+                      00439         MOVF valaux04,0        ;Extrae el valor de la respuesta en W 
+                      00440         MOVWF Rresulm3edid4    ;Guarda la respuesta en el indicador de registro 
+Warning[205]: Found directive in column 1. (endm)
+                      00441 endm
+                      00442 
+                      00443 ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                      00444  ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ Para teclado 4x4         \\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                      00445  ;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                      00446  
+                      00447 iniciar_teclado macro
+                      00448         CALL IN1ci0t3cla4do
+Warning[205]: Found directive in column 1. (endm)
+                      00449 endm
+                      00450 
+                      00451 leertecla macro
+                      00452         BSF Sit3cl4pus,0
+                      00453         CALL Tttest3aTecld0o
+Warning[205]: Found directive in column 1. (endm)
+                      00454 endm
+                      00455 
+                      00456 irsitecla macro subrutdepulso
+                      00457         BCF Sit3cl4pus,0
+                      00458         CALL Tttest3aTecld0o
+                      00459         MOVF tekl4pul5,0
+                      00460         BTFSS Hhayrt3cla,0
+                      00461         GOTO subrutdepulso
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[205]: Found directive in column 1. (endm)
+                      00462 endm
+                      00463 
+                      00464 llamarsitecla macro subrutdepulso
+                      00465         BCF Sit3cl4pus,0
+                      00466         CALL Tttest3aTecld0o
+                      00467         MOVF tekl4pul5,0
+                      00468         BTFSS Hhayrt3cla,0
+                      00469         CALL subrutdepulso
+Warning[205]: Found directive in column 1. (endm)
+                      00470 endm
+                      00471 
+                      00472 ; ///////////////////////////////-------------------------//////////////////////////////////////////////
+                            ////
+Warning[205]: Found directive in column 1. (CBLOCK)
+                      00005 CBLOCK 0x20 ; bloque de memorias
+  00000020            00006 teclapulsada ; Variable donde se guarda la 1ra tecla pulsada
+  00000021            00007 teclapulsada2 ; Variable donde se guarda la 2da tecla pulsada
+  00000022            00008 teclapulsada3 ; Variable donde se guarda la 3ra tecla pulsada
+  00000023            00009 teclapulsada4 ; Variable donde se guarda la 4ta tecla pulsada
+Warning[205]: Found directive in column 1. (ENDC)
+                      00010 ENDC ; fin del bloque de memorias
+Warning[205]: Found directive in column 1. (ORG)
+                      00011 ORG 0
+                      00012 
+Warning[206]: Found call to macro in column 1. (banco)
+                      00013 banco 1 ; ir al banco 1
+                          M ;banco 0
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==0
+                          M BCF STATUS, RP0
+                          M BCF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==1
+                          M ;banco 1
+Warning[203]: Found opcode in column 1. (BSF)
+0000   1683               M BSF STATUS, RP0
+Warning[203]: Found opcode in column 1. (BCF)
+0001   1303               M BCF STATUS, RP1
+Warning[205]: Found directive in column 1. (endif)
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==2
+                          M ;banco 2
+                          M BCF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==3
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                          M ;banco 3
+                          M BSF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[203]: Found opcode in column 1. (CLRF)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0002   0188           00014 CLRF TRISD ; puerto D como salida (display)
+Warning[203]: Found opcode in column 1. (BCF)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0003   1007           00015 BCF TRISC, 0 ; puerto RC0 como salida (led rojo - acceso denegado)
+Warning[203]: Found opcode in column 1. (BCF)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0004   1087           00016 BCF TRISC, 1 ; puerto RC1 como salida (led verde - acceso permitido)
+Warning[203]: Found opcode in column 1. (BCF)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0005   1107           00017 BCF TRISC, 2 ; puerto RC2 como salida (buzzer)
+Warning[206]: Found call to macro in column 1. (banco)
+                      00018 banco 0 ; ir al banco 0
+                          M ;banco 0
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==0
+Warning[203]: Found opcode in column 1. (BCF)
+0006   1283               M BCF STATUS, RP0
+Warning[203]: Found opcode in column 1. (BCF)
+0007   1303               M BCF STATUS, RP1
+Warning[205]: Found directive in column 1. (endif)
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==1
+                          M ;banco 1
+                          M BSF STATUS, RP0
+                          M BCF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==2
+                          M ;banco 2
+                          M BCF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==3
+                          M ;banco 3
+                          M BSF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[203]: Found opcode in column 1. (CLRF)
+0008   0188           00019 CLRF PORTD      ;Limpiamos puerto D (Apagamos el display)
+Warning[203]: Found opcode in column 1. (BCF)
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0009   1007           00020 BCF PORTC, 0 ;led rojo inicialmente apagado
+Warning[203]: Found opcode in column 1. (BCF)
+000A   1087           00021 BCF PORTC, 1 ;led verde inicialmente apagado
+Warning[203]: Found opcode in column 1. (BCF)
+000B   1107           00022 BCF PORTC, 2 ;buzzer inicialmente apagado
+Warning[206]: Found call to macro in column 1. (iniciar_teclado)
+                      00023 iniciar_teclado ;Iniciamos el teclado matricial 4x4 (configuraciones)
+000C   2???               M         CALL IN1ci0t3cla4do
+                      00024 
+000D                  00025 PROGRAMA
+                      00026     
+Warning[206]: Found call to macro in column 1. (leertecla)
+                      00027 leertecla               ;leemos 1ra tecla
+000D   1426               M         BSF Sit3cl4pus,0
+000E   2???               M         CALL Tttest3aTecld0o
+Warning[203]: Found opcode in column 1. (MOVWF)
+000F   00A0           00028 MOVWF teclapulsada      ;Guardamos la tecla pulsada en el registro 
+Warning[206]: Found call to macro in column 1. (registrocdisplay)
+                      00029 registrocdisplay teclapulsada ;Escribimos la teclapulsada en el display (catodo comun)
+0010   0820               M         MOVF teclapulsada,0
+0011   2???               M         CALL TABLACATODO
+0012   0088               M         MOVWF PORTD
+Warning[206]: Found call to macro in column 1. (milisegundo)
+                      00030 milisegundo .255 ; delay antirebote
+0013   30FF               M                          movlw .255
+0014   2???               M                          call  milisegundos
+                      00031     
+Warning[206]: Found call to macro in column 1. (leertecla)
+                      00032 leertecla               ;leemos 2da tecla
+0015   1426               M         BSF Sit3cl4pus,0
+0016   2???               M         CALL Tttest3aTecld0o
+Warning[203]: Found opcode in column 1. (MOVWF)
+0017   00A1           00033 MOVWF teclapulsada2      ;Guardamos la tecla pulsada en el registro 
+Warning[206]: Found call to macro in column 1. (registrocdisplay)
+                      00034 registrocdisplay teclapulsada2 ;Escribimos la teclapulsada en el display (catodo comun)
+0018   0821               M         MOVF teclapulsada2,0
+0019   2???               M         CALL TABLACATODO
+001A   0088               M         MOVWF PORTD
+Warning[206]: Found call to macro in column 1. (milisegundo)
+                      00035 milisegundo .255 ; delay antirebote
+001B   30FF               M                          movlw .255
+001C   2???               M                          call  milisegundos
+                      00036     
+Warning[206]: Found call to macro in column 1. (leertecla)
+                      00037 leertecla               ;leemos 3ra tecla
+001D   1426               M         BSF Sit3cl4pus,0
+001E   2???               M         CALL Tttest3aTecld0o
+Warning[203]: Found opcode in column 1. (MOVWF)
+001F   00A2           00038 MOVWF teclapulsada3      ;Guardamos la tecla pulsada en el registro 
+Warning[206]: Found call to macro in column 1. (registrocdisplay)
+                      00039 registrocdisplay teclapulsada3 ;Escribimos la teclapulsada en el display (catodo comun)
+0020   0822               M         MOVF teclapulsada3,0
+0021   2???               M         CALL TABLACATODO
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0022   0088               M         MOVWF PORTD
+Warning[206]: Found call to macro in column 1. (milisegundo)
+                      00040 milisegundo .255 ; delay antirebote 
+0023   30FF               M                          movlw .255
+0024   2???               M                          call  milisegundos
+                      00041     
+Warning[206]: Found call to macro in column 1. (leertecla)
+                      00042 leertecla               ;leemos 4ta tecla
+0025   1426               M         BSF Sit3cl4pus,0
+0026   2???               M         CALL Tttest3aTecld0o
+Warning[203]: Found opcode in column 1. (MOVWF)
+0027   00A3           00043 MOVWF teclapulsada4      ;Guardamos la tecla pulsada en el registro 
+Warning[206]: Found call to macro in column 1. (registrocdisplay)
+                      00044 registrocdisplay teclapulsada4 ;Escribimos la teclapulsada en el display (catodo comun)
+0028   0823               M         MOVF teclapulsada4,0
+0029   2???               M         CALL TABLACATODO
+002A   0088               M         MOVWF PORTD
+Warning[206]: Found call to macro in column 1. (milisegundo)
+                      00045 milisegundo .255 ; delay antirebote
+002B   30FF               M                          movlw .255
+002C   2???               M                          call  milisegundos
+                      00046 
+                      00047 ; ----------------------- Sección de la contraseña: 0626 --------------------
+Warning[206]: Found call to macro in column 1. (csni)
+                      00048 csni teclapulsada,.0, DENEGADO ; Si al consultar la contraseña, 1 digito falla
+002D   3000               M                         movlw .0
+002E   0220               M                         subwf teclapulsada,0
+002F   1D03               M                         btfss STATUS,Z
+0030   2???               M                         goto DENEGADO
+Warning[206]: Found call to macro in column 1. (csni)
+                      00049 csni teclapulsada2,.6, DENEGADO ; automaticamente se irá a la subrutina
+0031   3006               M                         movlw .6
+0032   0221               M                         subwf teclapulsada2,0
+0033   1D03               M                         btfss STATUS,Z
+0034   2???               M                         goto DENEGADO
+Warning[206]: Found call to macro in column 1. (csni)
+                      00050 csni teclapulsada3,.2, DENEGADO ; llamada denegado
+0035   3002               M                         movlw .2
+0036   0222               M                         subwf teclapulsada3,0
+0037   1D03               M                         btfss STATUS,Z
+0038   2???               M                         goto DENEGADO
+Warning[206]: Found call to macro in column 1. (csni)
+                      00051 csni teclapulsada4,.6, DENEGADO
+0039   3006               M                         movlw .6
+003A   0223               M                         subwf teclapulsada4,0
+003B   1D03               M                         btfss STATUS,Z
+003C   2???               M                         goto DENEGADO
+                      00052  
+                      00053 ; ----------------------- Secuencia de entrada permitida -------------------
+                      00054 ; Si se ha llegado aquí es porque la contraseña es correcta.
+Warning[203]: Found opcode in column 1. (CALL)
+003D   2???           00055 CALL PERMITIDO
+Warning[203]: Found opcode in column 1. (GOTO)
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003E   2???           00056 GOTO PROGRAMA           ;finaliza el programa
+                      00057  
+003F                  00058 DENEGADO ; aquí empieza la subrutina en caso de que la contraseña sea erronea
+Warning[203]: Found opcode in column 1. (BSF)
+003F   1407           00059 BSF PORTC, 0 ; encendemos led rojo
+Warning[203]: Found opcode in column 1. (BSF)
+0040   1507           00060 BSF PORTC, 2 ; encendemos buzzer - alarma
+Warning[206]: Found call to macro in column 1. (segundo)
+                      00061 segundo .2 ; delay de 2 segundos
+0041   3002               M                          movlw .2
+0042   2???               M                          call  segundos
+Warning[203]: Found opcode in column 1. (BCF)
+0043   1007           00062 BCF PORTC, 0 ; apagamos led rojo
+Warning[203]: Found opcode in column 1. (BCF)
+0044   1107           00063 BCF PORTC, 2 ; apagamos buzzer - alarma
+Warning[203]: Found opcode in column 1. (CLRF)
+0045   0188           00064 CLRF PORTD
+Warning[203]: Found opcode in column 1. (GOTO)
+0046   2???           00065 GOTO PROGRAMA ; reiniciamos el programa
+                      00066 
+0047                  00067 PERMITIDO
+Warning[203]: Found opcode in column 1. (BSF)
+0047   1487           00068 BSF PORTC, 1 ; encendemos led verde
+Warning[206]: Found call to macro in column 1. (segundo)
+                      00069 segundo .2 ; delay de 2 segundos
+0048   3002               M                          movlw .2
+0049   2???               M                          call  segundos
+Warning[203]: Found opcode in column 1. (BCF)
+004A   1087           00070 BCF PORTC, 1 ; apagamos led verde
+Warning[203]: Found opcode in column 1. (CLRF)
+004B   0188           00071 CLRF PORTD
+Warning[203]: Found opcode in column 1. (GOTO)
+004C   2???           00072 GOTO PROGRAMA ; reiniciamos el programa
+                      00073  
+Warning[205]: Found directive in column 1. (INCLUDE)
+                      00074 INCLUDE <teclado4x4.asm> ; libreria para teclado
+                      00001 ; ....................www.rodrigocarita.com................................
+                      00002 ; Librerï¿½a para teclado matricial 4x4
+                      00003 ;Versiï¿½n : 1.0
+                      00004 ;..:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                            ::::::::
+                      00005 ;Atencion: Esta librerï¿½a funciona con la macro en Versiï¿½n 1.2 y superiores.
+                      00006 ;:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                            ::::::
+                      00007 ;   | 1 | 2 | 3 | A |   --->PORTB,0
+                      00008 ;   | 4 | 5 | 6 | B |   ---> PORTB,1
+                      00009 ;   | 7 | 8 | 9 | C |    --->PORTB,2
+                      00010 ;   | * | 0 | # | D |   ---> PORTB,3
+                      00011 ;      |    |    |    |
+                      00012 ;    RB4 RB5 RB6 RB7
+                      00013 ;::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                      00014 ;Modo de conexiï¿½n es sencilla, con el teclado mirï¿½ndonos, los pines se conectan de modo
+                      00015 ;                                    RB0,RB1,RB2,RB3,...,RB7,
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00016 ;-------------------------------------------------------------------------------------------------------
+                            ----------------------
+                      00017 
+Warning[205]: Found directive in column 1. (CBLOCK)
+                      00018 CBLOCK               ;Bloque de memorias para la subrutina
+  00000024            00019 tekl4pul5        ;Registro donde se almacenarï¿½ el valor de la tecla pulsada
+  00000025            00020 c0mpparadD0r ;Registro que serï¿½ el comparador para el escaner de teclado
+  00000026            00021 Sit3cl4pus     ;Registro de bucle para pausar o leer de corrido
+  00000027            00022 Hhayrt3cla     ;Registro que permite saber si hay una tecla pulsada
+Warning[205]: Found directive in column 1. (ENDC)
+                      00023 ENDC            ;Fin bloques de memorias        
+                      00024 
+004D                  00025 IN1ci0t3cla4do                  ; Subrutina de configuraciï¿½n de Teclado. Activa las resistencias PULL-
+                            UP
+Warning[206]: Found call to macro in column 1. (banco)
+                      00026 banco 1                                 ;Vamos al banco 1
+                          M ;banco 0
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==0
+                          M BCF STATUS, RP0
+                          M BCF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==1
+                          M ;banco 1
+Warning[203]: Found opcode in column 1. (BSF)
+004D   1683               M BSF STATUS, RP0
+Warning[203]: Found opcode in column 1. (BCF)
+004E   1303               M BCF STATUS, RP1
+Warning[205]: Found directive in column 1. (endif)
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==2
+                          M ;banco 2
+                          M BCF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 1==3
+                          M ;banco 3
+                          M BSF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[203]: Found opcode in column 1. (MOVLW)
+004F   30F0           00027 MOVLW b'11110000'       ; Configuramos las columnas como salida y las filas como entrada
+Warning[203]: Found opcode in column 1. (MOVWF)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0050   0086           00028 MOVWF TRISB                     ;del puerto B.
+Warning[203]: Found opcode in column 1. (BCF)
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 17
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0051   1381           00029 BCF OPTION_REG,NOT_RBPU         ;Activa las resistencias tipo PULL-UP del pic
+Warning[206]: Found call to macro in column 1. (banco)
+                      00030 banco 0                                 ;Regresamos al Banco 0
+                          M ;banco 0
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==0
+Warning[203]: Found opcode in column 1. (BCF)
+0052   1283               M BCF STATUS, RP0
+Warning[203]: Found opcode in column 1. (BCF)
+0053   1303               M BCF STATUS, RP1
+Warning[205]: Found directive in column 1. (endif)
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==1
+                          M ;banco 1
+                          M BSF STATUS, RP0
+                          M BCF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==2
+                          M ;banco 2
+                          M BCF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[205]: Found directive in column 1. (if)
+                          M if 0==3
+                          M ;banco 3
+                          M BSF STATUS, RP0
+                          M BSF STATUS, RP1
+                          M endif
+                          M 
+Warning[203]: Found opcode in column 1. (CLRF)
+0054   01A4           00031 CLRF tekl4pul5          ;Limpiamos memorias de teclapulsada
+Warning[203]: Found opcode in column 1. (CLRF)
+0055   01A6           00032 CLRF Sit3cl4pus         ;Limpiamos permisos para bucles
+Warning[203]: Found opcode in column 1. (RETURN)
+0056   0008           00033 RETURN                          ;Salimos de la subrutina de configuraciï¿½n
+                      00034 
+0057                  00035 Tttest3aTecld0o                                                 ;tï¿½tulo de subrutina para escaner de t
+                            eclado  
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00036 cargarvalor .0,Hhayrt3cla                               ;Limpiamos el valor de comprobaciï¿½n si hubo un
+                            a tecla pulsada
+0057   3000               M         MOVLW .0
+0058   00A7               M         MOVWF Hhayrt3cla
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00037 cargarvalor b'11111110',PORTB                   ;Cargamos el primer valor para escanear la primera fila
+0059   30FE               M         MOVLW b'11111110'
+005A   0086               M         MOVWF PORTB
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[203]: Found opcode in column 1. (nop)
+005B   0000           00038 nop                                                                             ;Tiempo paranï¿½ico
+Warning[206]: Found call to macro in column 1. (copiarregistro)
+                      00039 copiarregistro PORTB,c0mpparadD0r               ;Leemos el puerto B para ver si hay un botï¿½n pulsado
+005C   0806               M         MOVF PORTB,0
+005D   00A5               M         MOVWF c0mpparadD0r
+Warning[206]: Found call to macro in column 1. (csi)
+                      00040 csi c0mpparadD0r,b'11101110',BoTt0Nn1   ;Iniciamos el Escaneo, Se pulsï¿½ la primera columnï¿½? 
+005E   30EE               M                 movlw   b'11101110'
+005F   0225               M                  subwf  c0mpparadD0r,0
+0060   1903               M                  btfsc  STATUS,Z
+0061   2???               M                  goto   BoTt0Nn1
+Warning[206]: Found call to macro in column 1. (csi)
+                      00041 csi c0mpparadD0r,b'11011110',BoTt0Nn2   ;Se pulsï¿½ la segunda columna? 
+0062   30DE               M                 movlw   b'11011110'
+0063   0225               M                  subwf  c0mpparadD0r,0
+0064   1903               M                  btfsc  STATUS,Z
+0065   2???               M                  goto   BoTt0Nn2
+Warning[206]: Found call to macro in column 1. (csi)
+                      00042 csi c0mpparadD0r,b'10111110',BoTt0Nn3   ;Se pulsï¿½ la tercera columna?
+0066   30BE               M                 movlw   b'10111110'
+0067   0225               M                  subwf  c0mpparadD0r,0
+0068   1903               M                  btfsc  STATUS,Z
+0069   2???               M                  goto   BoTt0Nn3
+Warning[206]: Found call to macro in column 1. (csi)
+                      00043 csi c0mpparadD0r,b'01111110',BoTt0NnA   ;Se pulsï¿½ la cuarta columna?
+006A   307E               M                 movlw   b'01111110'
+006B   0225               M                  subwf  c0mpparadD0r,0
+006C   1903               M                  btfsc  STATUS,Z
+006D   2???               M                  goto   BoTt0NnA
+                      00044 
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00045 cargarvalor b'11111101',PORTB                   ;Cargamos el segundo valor para escanear la segunda fila
+006E   30FD               M         MOVLW b'11111101'
+006F   0086               M         MOVWF PORTB
+Warning[203]: Found opcode in column 1. (nop)
+0070   0000           00046 nop                                                                             ;Tiempo paranï¿½ico
+Warning[206]: Found call to macro in column 1. (copiarregistro)
+                      00047 copiarregistro PORTB,c0mpparadD0r                ;Leemos el puerto B para ver si hay un botï¿½n pulsado
+0071   0806               M         MOVF PORTB,0
+0072   00A5               M         MOVWF c0mpparadD0r
+Warning[206]: Found call to macro in column 1. (csi)
+                      00048 csi c0mpparadD0r,b'11101101',BoTt0Nn4         ;Iniciamos el Escaneo, Se pulsï¿½ la primera columnï¿½?   
+0073   30ED               M                 movlw   b'11101101'
+0074   0225               M                  subwf  c0mpparadD0r,0
+0075   1903               M                  btfsc  STATUS,Z
+0076   2???               M                  goto   BoTt0Nn4
+Warning[206]: Found call to macro in column 1. (csi)
+                      00049 csi c0mpparadD0r,b'11011101',BoTt0Nn5         ;Se pulsï¿½ la segunda columna?   
+0077   30DD               M                 movlw   b'11011101'
+0078   0225               M                  subwf  c0mpparadD0r,0
+0079   1903               M                  btfsc  STATUS,Z
+007A   2???               M                  goto   BoTt0Nn5
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 19
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[206]: Found call to macro in column 1. (csi)
+                      00050 csi c0mpparadD0r,b'10111101',BoTt0Nn6         ;Se pulsï¿½ la tercera columna?
+007B   30BD               M                 movlw   b'10111101'
+007C   0225               M                  subwf  c0mpparadD0r,0
+007D   1903               M                  btfsc  STATUS,Z
+007E   2???               M                  goto   BoTt0Nn6
+Warning[206]: Found call to macro in column 1. (csi)
+                      00051 csi c0mpparadD0r,b'01111101',BoTt0NnB         ;Se pulsï¿½ la cuarta columna?
+007F   307D               M                 movlw   b'01111101'
+0080   0225               M                  subwf  c0mpparadD0r,0
+0081   1903               M                  btfsc  STATUS,Z
+0082   2???               M                  goto   BoTt0NnB
+                      00052 
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00053 cargarvalor b'11111011',PORTB                   ;Cargamos el tercer valor para escanear la tercera fila 
+0083   30FB               M         MOVLW b'11111011'
+0084   0086               M         MOVWF PORTB
+Warning[203]: Found opcode in column 1. (nop)
+0085   0000           00054 nop                                                                                    ;Tiempo paranï¿½i
+                            co 
+Warning[206]: Found call to macro in column 1. (copiarregistro)
+                      00055 copiarregistro PORTB,c0mpparadD0r                  ;Leemos el puerto B para ver si hay un botï¿½n pulsad
+                            o
+0086   0806               M         MOVF PORTB,0
+0087   00A5               M         MOVWF c0mpparadD0r
+Warning[206]: Found call to macro in column 1. (csi)
+                      00056 csi c0mpparadD0r,b'11101011',BoTt0Nn7         ;Iniciamos el Escaneo, Se pulsï¿½ la primera columnï¿½?   
+0088   30EB               M                 movlw   b'11101011'
+0089   0225               M                  subwf  c0mpparadD0r,0
+008A   1903               M                  btfsc  STATUS,Z
+008B   2???               M                  goto   BoTt0Nn7
+Warning[206]: Found call to macro in column 1. (csi)
+                      00057 csi c0mpparadD0r,b'11011011',BoTt0Nn8         ;Se pulsï¿½ la segunda columna?   
+008C   30DB               M                 movlw   b'11011011'
+008D   0225               M                  subwf  c0mpparadD0r,0
+008E   1903               M                  btfsc  STATUS,Z
+008F   2???               M                  goto   BoTt0Nn8
+Warning[206]: Found call to macro in column 1. (csi)
+                      00058 csi c0mpparadD0r,b'10111011',BoTt0Nn9         ;Se pulsï¿½ la tercera columna?
+0090   30BB               M                 movlw   b'10111011'
+0091   0225               M                  subwf  c0mpparadD0r,0
+0092   1903               M                  btfsc  STATUS,Z
+0093   2???               M                  goto   BoTt0Nn9
+Warning[206]: Found call to macro in column 1. (csi)
+                      00059 csi c0mpparadD0r,b'01111011',BoTt0NnC         ;Se pulsï¿½ la cuarta columna?
+0094   307B               M                 movlw   b'01111011'
+0095   0225               M                  subwf  c0mpparadD0r,0
+0096   1903               M                  btfsc  STATUS,Z
+0097   2???               M                  goto   BoTt0NnC
+                      00060 
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00061 cargarvalor b'11110111',PORTB                   ;Cargamos el cuarto valor para escanear la cuarta fila  
+0098   30F7               M         MOVLW b'11110111'
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 20
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0099   0086               M         MOVWF PORTB
+Warning[203]: Found opcode in column 1. (nop)
+009A   0000           00062 nop                                                                                    ;Tiempo paranï¿½i
+                            co 
+Warning[206]: Found call to macro in column 1. (copiarregistro)
+                      00063 copiarregistro PORTB,c0mpparadD0r                  ;Leemos el puerto B para ver si hay un botï¿½n pulsad
+                            o
+009B   0806               M         MOVF PORTB,0
+009C   00A5               M         MOVWF c0mpparadD0r
+Warning[206]: Found call to macro in column 1. (csi)
+                      00064 csi c0mpparadD0r,b'11100111',BoTt0NnAST     ;Iniciamos el Escaneo, Se pulsï¿½ la primera columnï¿½?     
+009D   30E7               M                 movlw   b'11100111'
+009E   0225               M                  subwf  c0mpparadD0r,0
+009F   1903               M                  btfsc  STATUS,Z
+00A0   2???               M                  goto   BoTt0NnAST
+Warning[206]: Found call to macro in column 1. (csi)
+                      00065 csi c0mpparadD0r,b'11010111',BoTt0Nn0         ;Se pulsï¿½ la segunda columna?   
+00A1   30D7               M                 movlw   b'11010111'
+00A2   0225               M                  subwf  c0mpparadD0r,0
+00A3   1903               M                  btfsc  STATUS,Z
+00A4   2???               M                  goto   BoTt0Nn0
+Warning[206]: Found call to macro in column 1. (csi)
+                      00066 csi c0mpparadD0r,b'10110111',BoTt0NnMICH   ;Se pulsï¿½ la tercera columna? 
+00A5   30B7               M                 movlw   b'10110111'
+00A6   0225               M                  subwf  c0mpparadD0r,0
+00A7   1903               M                  btfsc  STATUS,Z
+00A8   2???               M                  goto   BoTt0NnMICH
+Warning[206]: Found call to macro in column 1. (csi)
+                      00067 csi c0mpparadD0r,b'01110111',BoTt0NnD         ;Se pulsï¿½ la cuarta columna?
+00A9   3077               M                 movlw   b'01110111'
+00AA   0225               M                  subwf  c0mpparadD0r,0
+00AB   1903               M                  btfsc  STATUS,Z
+00AC   2???               M                  goto   BoTt0NnD
+Warning[206]: Found call to macro in column 1. (csi)
+                      00068 csi c0mpparadD0r,b'11110111',SinTecl4    ; NO SE PULSï¿½ NADA?? 
+00AD   30F7               M                 movlw   b'11110111'
+00AE   0225               M                  subwf  c0mpparadD0r,0
+00AF   1903               M                  btfsc  STATUS,Z
+00B0   2???               M                  goto   SinTecl4
+                      00069 
+00B1                  00070 SinTecl4                                        ;Subrutina para cuando no haya alguna tecla pulsada.    
+                                    
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00071 cargarvalor .1,Hhayrt3cla       ; Carga el valor de 1 en el registro Hhayrt3cla 
+00B1   3001               M         MOVLW .1
+00B2   00A7               M         MOVWF Hhayrt3cla
+Warning[203]: Found opcode in column 1. (BTFSS)
+00B3   1C26           00072 BTFSS Sit3cl4pus,0                      ;Esta en el modo de pausa?
+Warning[203]: Found opcode in column 1. (RETURN)
+00B4   0008           00073 RETURN                                          ;Caso falso: Sale de la subrutina continuando con el pro
+                            grama principal
+Warning[203]: Found opcode in column 1. (GOTO)
+00B5   2???           00074 GOTO Tttest3aTecld0o                    ;Caso verdadero: Continua testeando el teclado hasta que una tec
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 21
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            la se pulse
+                      00075 
+00B6                  00076 BoTt0Nn0                                        ;Subrutina para cuando se presione el botï¿½n 0
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00077 cargarvalor .0,tekl4pul5                ;Carga el valor de "0" en el registro de respuesta tekl4pul5 
+00B6   3000               M         MOVLW .0
+00B7   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00B8   0008           00078 RETURN                                          ;Sale de la subrutina de teclado
+                      00079 
+00B9                  00080 BoTt0Nn1                                        ;Subrutina para cuando se presione el botï¿½n 1
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00081 cargarvalor .1,tekl4pul5           ;Carga el valor de "1" en el registro de respuesta tekl4pul5 
+00B9   3001               M         MOVLW .1
+00BA   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00BB   0008           00082 RETURN                                                  ;Sale de la subrutina de teclado
+                      00083 
+00BC                  00084 BoTt0Nn2                                        ;Subrutina para cuando se presione el botï¿½n 2
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00085 cargarvalor .2,tekl4pul5           ;Carga el valor de "2" en el registro de respuesta tekl4pul5 
+00BC   3002               M         MOVLW .2
+00BD   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00BE   0008           00086 RETURN                                                  ;Sale de la subrutina de teclado
+                      00087 
+00BF                  00088 BoTt0Nn3                                        ;Subrutina para cuando se presione el botï¿½n 3
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00089 cargarvalor .3,tekl4pul5           ;Carga el valor de "3" en el registro de respuesta tekl4pul5 
+00BF   3003               M         MOVLW .3
+00C0   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00C1   0008           00090 RETURN                                                  ;Sale de la subrutina de teclado
+                      00091 
+00C2                  00092 BoTt0Nn4                                        ;Subrutina para cuando se presione el botï¿½n 4
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00093 cargarvalor .4,tekl4pul5           ;Carga el valor de "4" en el registro de respuesta tekl4pul5 
+00C2   3004               M         MOVLW .4
+00C3   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00C4   0008           00094 RETURN                                                  ;Sale de la subrutina de teclado
+                      00095 
+00C5                  00096 BoTt0Nn5                                        ;Subrutina para cuando se presione el botï¿½n 5
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00097 cargarvalor .5,tekl4pul5           ;Carga el valor de "5" en el registro de respuesta tekl4pul5 
+00C5   3005               M         MOVLW .5
+00C6   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00C7   0008           00098 RETURN                                                  ;Sale de la subrutina de teclado
+                      00099 
+00C8                  00100 BoTt0Nn6                                        ;Subrutina para cuando se presione el botï¿½n 6
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00101 cargarvalor .6,tekl4pul5           ;Carga el valor de "6" en el registro de respuesta tekl4pul5 
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 22
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C8   3006               M         MOVLW .6
+00C9   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00CA   0008           00102 RETURN                                                  ;Sale de la subrutina de teclado
+                      00103 
+00CB                  00104 BoTt0Nn7                                        ;Subrutina para cuando se presione el botï¿½n 7
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00105 cargarvalor .7,tekl4pul5           ;Carga el valor de "7" en el registro de respuesta tekl4pul5 
+00CB   3007               M         MOVLW .7
+00CC   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00CD   0008           00106 RETURN                                                  ;Sale de la subrutina de teclado
+                      00107 
+00CE                  00108 BoTt0Nn8                                        ;Subrutina para cuando se presione el botï¿½n 8
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00109 cargarvalor .8,tekl4pul5           ;Carga el valor de "8" en el registro de respuesta tekl4pul5 
+00CE   3008               M         MOVLW .8
+00CF   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00D0   0008           00110 RETURN                                                  ;Sale de la subrutina de teclado
+                      00111 
+00D1                  00112 BoTt0Nn9                                        ;Subrutina para cuando se presione el botï¿½n 9 
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00113 cargarvalor .9,tekl4pul5           ;Carga el valor de "9" en el registro de respuesta tekl4pul5 
+00D1   3009               M         MOVLW .9
+00D2   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00D3   0008           00114 RETURN                                                  ;Sale de la subrutina de teclado
+                      00115 
+00D4                  00116 BoTt0NnA                                        ;Subrutina para cuando se presione el botï¿½n A
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00117 cargarvalor .10,tekl4pul5        ;Carga el valor de "10" en el registro de respuesta tekl4pul5
+00D4   300A               M         MOVLW .10
+00D5   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00D6   0008           00118 RETURN                                                  ;Sale de la subrutina de teclado
+                      00119 
+00D7                  00120 BoTt0NnB                                        ;Subrutina para cuando se presione el botï¿½n B
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00121 cargarvalor .11,tekl4pul5        ;Carga el valor de "11" en el registro de respuesta tekl4pul5
+00D7   300B               M         MOVLW .11
+00D8   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00D9   0008           00122 RETURN                                                  ;Sale de la subrutina de teclado
+                      00123 
+00DA                  00124 BoTt0NnC                                        ;Subrutina para cuando se presione el botï¿½n C
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00125 cargarvalor .12,tekl4pul5        ;Carga el valor de "12" en el registro de respuesta tekl4pul5
+00DA   300C               M         MOVLW .12
+00DB   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00DC   0008           00126 RETURN                                                  ;Sale de la subrutina de teclado
+                      00127 
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 23
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00DD                  00128 BoTt0NnD                                        ;Subrutina para cuando se presione el botï¿½n D
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00129 cargarvalor .13,tekl4pul5        ;Carga el valor de "13" en el registro de respuesta tekl4pul5
+00DD   300D               M         MOVLW .13
+00DE   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00DF   0008           00130 RETURN                                                  ;Sale de la subrutina de teclado
+                      00131 
+00E0                  00132 BoTt0NnAST                                      ;Subrutina para cuando se presione el botï¿½n * 
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00133 cargarvalor .14,tekl4pul5        ;Carga el valor de "14" en el registro de respuesta tekl4pul5
+00E0   300E               M         MOVLW .14
+00E1   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00E2   0008           00134 RETURN                                                  ;Sale de la subrutina de teclado
+                      00135 
+00E3                  00136 BoTt0NnMICH                                     ;Subrutina para cuando se presione el botï¿½n #
+Warning[206]: Found call to macro in column 1. (cargarvalor)
+                      00137 cargarvalor .15,tekl4pul5        ;Carga el valor de "15" en el registro de respuesta tekl4pul5
+00E3   300F               M         MOVLW .15
+00E4   00A4               M         MOVWF tekl4pul5
+Warning[203]: Found opcode in column 1. (RETURN)
+00E5   0008           00138 RETURN                                                  ;Sale de la subrutina de teclado
+                      00139 
+                      00140 ; Revisa las ï¿½ltimas actualizaciones de la librerï¿½a en:
+                      00141 ;......................................................................... rodrigocarita.com ...........
+                            .......................................................................................
+                      00142 
+Warning[205]: Found directive in column 1. (INCLUDE)
+                      00075 INCLUDE <display.ASM> ; libreria display 7 segmentos
+                      00001 ; Libreria: display.asm
+                      00002 ; Version : 1.1
+                      00003 ; ---------------------------------------------------------------------------
+Warning[205]: Found directive in column 1. (CBLOCK)
+                      00004 CBLOCK
+  00000028            00005 V4LooR3s
+Warning[205]: Found directive in column 1. (ENDC)
+                      00006 ENDC
+                      00007 
+00E6                  00008 TABLACATODO
+Warning[203]: Found opcode in column 1. (MOVWF)
+00E6   00A8           00009 MOVWF V4LooR3s
+Warning[203]: Found opcode in column 1. (MOVLW)
+00E7   300A           00010 MOVLW d'10'
+Warning[203]: Found opcode in column 1. (SUBWF)
+00E8   0228           00011 SUBWF V4LooR3s,0
+Warning[203]: Found opcode in column 1. (BTFSC)
+00E9   1803           00012 BTFSC STATUS,C
+Warning[203]: Found opcode in column 1. (RETLW)
+00EA   3440           00013 RETLW  b'01000000' ;Este codigo grafica un guion
+Warning[203]: Found opcode in column 1. (MOVF)
+00EB   0828           00014 MOVF V4LooR3s,0
+Warning[203]: Found opcode in column 1. (ADDWF)
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 24
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00EC   0782           00015 ADDWF PCL,1
+Warning[203]: Found opcode in column 1. (RETLW)
+00ED   343F           00016 RETLW b'00111111' ;Este codigo me grafica un 0
+Warning[203]: Found opcode in column 1. (RETLW)
+00EE   3406           00017 RETLW b'00000110' ;Este codigo me grafica un 1
+Warning[203]: Found opcode in column 1. (RETLW)
+00EF   345B           00018 RETLW b'01011011' ;Este codigo me grafica un 2
+Warning[203]: Found opcode in column 1. (RETLW)
+00F0   344F           00019 RETLW b'01001111' ;Este codigo me grafica un 3
+Warning[203]: Found opcode in column 1. (RETLW)
+00F1   3466           00020 RETLW b'01100110' ;Este codigo me grafica un 4
+Warning[203]: Found opcode in column 1. (RETLW)
+00F2   346D           00021 RETLW b'01101101' ;Este codigo me grafica un 5
+Warning[203]: Found opcode in column 1. (RETLW)
+00F3   347D           00022 RETLW b'01111101' ;Este codigo me grafica un 6
+Warning[203]: Found opcode in column 1. (RETLW)
+00F4   3427           00023 RETLW b'00100111' ;Este codigo me grafica un 7
+Warning[203]: Found opcode in column 1. (RETLW)
+00F5   347F           00024 RETLW b'01111111' ;Este codigo me grafica un 8
+Warning[203]: Found opcode in column 1. (RETLW)
+00F6   3467           00025 RETLW b'01100111' ;Este codigo me grafica un 9
+                      00026 
+00F7                  00027 TABLAANODO
+Warning[203]: Found opcode in column 1. (MOVWF)
+00F7   00A8           00028 MOVWF V4LooR3s
+Warning[203]: Found opcode in column 1. (MOVLW)
+00F8   300A           00029 MOVLW d'10'
+Warning[203]: Found opcode in column 1. (SUBWF)
+00F9   0228           00030 SUBWF V4LooR3s,0
+Warning[203]: Found opcode in column 1. (BTFSC)
+00FA   1803           00031 BTFSC STATUS,C
+Warning[203]: Found opcode in column 1. (RETLW)
+00FB   34BF           00032 RETLW  b'10111111' ;Este codigo grafica un guion
+Warning[203]: Found opcode in column 1. (MOVF)
+00FC   0828           00033 MOVF V4LooR3s,0
+Warning[203]: Found opcode in column 1. (ADDWF)
+00FD   0782           00034 ADDWF PCL,1
+Warning[203]: Found opcode in column 1. (RETLW)
+00FE   34C0           00035 RETLW b'11000000' ;Este codigo me grafica un 0
+Warning[203]: Found opcode in column 1. (RETLW)
+00FF   34F9           00036 RETLW b'11111001' ;Este codigo me grafica un 1
+Warning[203]: Found opcode in column 1. (RETLW)
+0100   34A4           00037 RETLW b'10100100' ;Este codigo me grafica un 2
+Warning[203]: Found opcode in column 1. (RETLW)
+0101   34B0           00038 RETLW b'10110000' ;Este codigo me grafica un 3
+Warning[203]: Found opcode in column 1. (RETLW)
+0102   3499           00039 RETLW b'10011001' ;Este codigo me grafica un 4
+Warning[203]: Found opcode in column 1. (RETLW)
+0103   3492           00040 RETLW b'10010010' ;Este codigo me grafica un 5
+Warning[203]: Found opcode in column 1. (RETLW)
+0104   3482           00041 RETLW b'10000010' ;Este codigo me grafica un 6
+Warning[203]: Found opcode in column 1. (RETLW)
+0105   34D8           00042 RETLW b'11011000' ;Este codigo me grafica un 7
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 25
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[203]: Found opcode in column 1. (RETLW)
+0106   3480           00043 RETLW b'10000000' ;Este codigo me grafica un 8
+Warning[203]: Found opcode in column 1. (RETLW)
+0107   3498           00044 RETLW b'10011000' ;Este codigo me grafica un 9
+                      00045 
+Warning[205]: Found directive in column 1. (INCLUDE)
+                      00076 INCLUDE <RETARDOS.ASM> ; libreria para retardos
+                      00001 ;::::::::::::: www.rodrigocarita.com ::::::::::::::::::::::::::
+                      00002 ;                       Retardos.asm   Versión: 1.0
+                      00003 
+                      00004 ; Librería de retardos por bucles anidados.
+                      00005 ; 
+                      00006 ;             Se utiliza con la Macro.inc
+                      00007 ; milisegundo .2   -> Genera un retardo de 2 milisegundos
+                      00008 ; Segundo .6 -> Genera un retardo de 6 segundos
+                      00009 ; Los valores deben estar entre 0 a 255.
+                      00010 
+                      00011         cblock                          
+  00000029            00012         memo_tiemp_1        
+  0000002A            00013         memo_tiemp_2        
+  0000002B            00014         memo_tiemp_3        
+  0000002C            00015         memo_tiemp_4
+                      00016         endc
+                      00017 
+0108                  00018 milisegundos
+0108   00A9           00019          movwf  memo_tiemp_1
+Warning[207]: Found label after column 1. (retbucle1)
+0109                  00020     retbucle1
+0109   3011           00021          movlw  .17
+010A   00AA           00022          movwf  memo_tiemp_2 
+Warning[207]: Found label after column 1. (retbucle2)
+010B                  00023     retbucle2
+010B   303A           00024          movlw  .58
+010C   00AB           00025          movwf  memo_tiemp_3     
+Warning[207]: Found label after column 1. (retbucle3)
+010D                  00026     retbucle3
+010D   0000           00027          nop
+010E   0000           00028          nop
+010F   0BAB           00029          decfsz memo_tiemp_3,1     
+0110   2???           00030          goto   retbucle3
+0111   0BAA           00031          decfsz memo_tiemp_2,1
+0112   2???           00032          goto   retbucle2
+0113   0BA9           00033          decfsz memo_tiemp_1,1
+0114   2???           00034          goto   retbucle1
+Warning[203]: Found opcode in column 1. (RETURN)
+0115   0008           00035 RETURN
+0116                  00036 segundos
+0116   00A9           00037          movwf  memo_tiemp_1
+Warning[207]: Found label after column 1. (retbucle1a)
+0117                  00038     retbucle1a
+0117   30FA           00039          movlw  .250
+0118   00AA           00040          movwf  memo_tiemp_2 
+Warning[207]: Found label after column 1. (retbucle2a)
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 26
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0119                  00041     retbucle2a
+0119   30FA           00042          movlw  .250
+011A   00AB           00043          movwf  memo_tiemp_3     
+Warning[207]: Found label after column 1. (retbucle3a)
+011B                  00044     retbucle3a
+011B   3013           00045          movlw  .19
+011C   00AC           00046          movwf  memo_tiemp_4 
+Warning[207]: Found label after column 1. (retbucle4a)
+011D                  00047     retbucle4a
+011D   0000           00048          nop
+011E   0BAC           00049          decfsz memo_tiemp_4,1 
+011F   2???           00050          goto   retbucle4a
+0120   0BAB           00051          decfsz memo_tiemp_3,1    
+0121   2???           00052          goto   retbucle3a
+0122   0BAA           00053          decfsz memo_tiemp_2,1
+0123   2???           00054          goto   retbucle2a
+0124   0BA9           00055          decfsz memo_tiemp_1,1
+0125   2???           00056          goto   retbucle1a
+Warning[203]: Found opcode in column 1. (RETURN)
+0126   0008           00057 RETURN
+                      00077 
+Warning[205]: Found directive in column 1. (END)
+3F32                  00078 END
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 27
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+BoTt0Nn0                          000000B6
+BoTt0Nn1                          000000B9
+BoTt0Nn2                          000000BC
+BoTt0Nn3                          000000BF
+BoTt0Nn4                          000000C2
+BoTt0Nn5                          000000C5
+BoTt0Nn6                          000000C8
+BoTt0Nn7                          000000CB
+BoTt0Nn8                          000000CE
+BoTt0Nn9                          000000D1
+BoTt0NnA                          000000D4
+BoTt0NnAST                        000000E0
+BoTt0NnB                          000000D7
+BoTt0NnC                          000000DA
+BoTt0NnD                          000000DD
+BoTt0NnMICH                       000000E3
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 28
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DENEGADO                          0000003F
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 29
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+Hhayrt3cla                        00000027
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+IN1ci0t3cla4do                    0000004D
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PERMITIDO                         00000047
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 30
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+PORTE                             00000009
+PR2                               00000092
+PROGRAMA                          0000000D
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+PULSOSUB                          
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 31
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SEN                               00000000
+SETF                              
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+SinTecl4                          000000B1
+Sit3cl4pus                        00000026
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TABLAANODO                        000000F7
+TABLACATODO                       000000E6
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 32
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 33
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+Tttest3aTecld0o                   00000057
+UA                                00000001
+V4LooR3s                          00000028
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 34
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+apagar                            
+apagarpantalla                    
+banco                             
+borralcd                          
+borrarfila                        
+c0mpparadD0r                      00000025
+cargarvalor                       
+convertir_a_bcd                   
+copiarregistro                    
+crearreg                          
+csi                               
+csir                              
+csni                              
+csnir                             
+cursor_derecha                    
+cursor_izquierda                  
+cursor_off                        
+cursor_on                         
+desplazaderecha                   
+desplazaizquierda                 
+encender                          
+encenderpantalla                  
+enviaradisplay                    
+enviarcdisplay                    
+escribir                          
+escribirmensaje                   
+escribirreg                       
+escribirregistro                  
+fila_enter                        
+fila_home                         
+iniciar_hcsr04                    
+iniciar_teclado                   
+iniciarlcd                        
+ir_a_fila                         
+irsitecla                         
+lcdfc                             
+leertecla                         
+llamarsitecla                     
+mayorque                          
+mayorquereg                       
+medir_ultrasonico                 
+memo_tiemp_1                      00000029
+memo_tiemp_2                      0000002A
+memo_tiemp_3                      0000002B
+memo_tiemp_4                      0000002C
+menorque                          
+menorquereg                       
+mensaje                           
+milisegundo                       
+MPASM 5.87                          MAIN.ASM   6-7-2024  11:36:30         PAGE 35
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+milisegundos                      00000108
+multiplicarreg                    
+on_lib_retardos_ms                
+puertoa                           00000005
+puertob                           00000006
+puertoc                           00000007
+puertod                           00000008
+puertoe                           00000009
+registroadisplay                  
+registrocdisplay                  
+restarreg                         
+retardo_ms                        
+retbucle1                         00000109
+retbucle1a                        00000117
+retbucle2                         0000010B
+retbucle2a                        00000119
+retbucle3                         0000010D
+retbucle3a                        0000011B
+retbucle4a                        0000011D
+segundo                           
+segundos                          00000116
+sumarreg                          
+teclapulsada                      00000020
+teclapulsada2                     00000021
+teclapulsada3                     00000022
+teclapulsada4                     00000023
+tekl4pul5                         00000024
+
+Errors   :     0
+Warnings :   246 reported,     0 suppressed
+Messages :     6 reported,     0 suppressed
+
+

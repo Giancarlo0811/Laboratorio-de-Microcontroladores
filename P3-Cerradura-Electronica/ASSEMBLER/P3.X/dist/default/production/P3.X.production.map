@@ -1,0 +1,98 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Fri Jun 07 11:36:33 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x00024e
+                   .cinit    romdata   0x000127    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/MAIN.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000128      
+                            0x002007    0x002007      
+            298 out of 8454 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 BoTt0Nn0   0x0000b6    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn1   0x0000b9    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn2   0x0000bc    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn3   0x0000bf    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn4   0x0000c2    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn5   0x0000c5    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn6   0x0000c8    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn7   0x0000cb    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn8   0x0000ce    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn9   0x0000d1    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnA   0x0000d4    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+               BoTt0NnAST   0x0000e0    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnB   0x0000d7    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnC   0x0000da    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnD   0x0000dd    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+              BoTt0NnMICH   0x0000e3    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 DENEGADO   0x00003f    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+           IN1ci0t3cla4do   0x00004d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                PERMITIDO   0x000047    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+                 PROGRAMA   0x00000d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+                 SinTecl4   0x0000b1    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+               TABLAANODO   0x0000f7    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\display.ASM
+              TABLACATODO   0x0000e6    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\display.ASM
+          Tttest3aTecld0o   0x000057    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+             milisegundos   0x000108    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle1   0x000109    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle1a   0x000117    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle2   0x00010b    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle2a   0x000119    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle3   0x00010d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle3a   0x00011b    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle4a   0x00011d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                 segundos   0x000116    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 PROGRAMA   0x00000d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+                 DENEGADO   0x00003f    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+                PERMITIDO   0x000047    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\main.asm
+           IN1ci0t3cla4do   0x00004d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+          Tttest3aTecld0o   0x000057    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 SinTecl4   0x0000b1    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn0   0x0000b6    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn1   0x0000b9    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn2   0x0000bc    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn3   0x0000bf    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn4   0x0000c2    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn5   0x0000c5    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn6   0x0000c8    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn7   0x0000cb    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn8   0x0000ce    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0Nn9   0x0000d1    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnA   0x0000d4    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnB   0x0000d7    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnC   0x0000da    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+                 BoTt0NnD   0x0000dd    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+               BoTt0NnAST   0x0000e0    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+              BoTt0NnMICH   0x0000e3    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\teclado4x4.asm
+              TABLACATODO   0x0000e6    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\display.ASM
+               TABLAANODO   0x0000f7    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\display.ASM
+             milisegundos   0x000108    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle1   0x000109    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle2   0x00010b    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                retbucle3   0x00010d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+                 segundos   0x000116    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle1a   0x000117    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle2a   0x000119    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle3a   0x00011b    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+               retbucle4a   0x00011d    program     static C:\Users\user\Documents\..USB\8° TRIMESTRE\LAB DE MICRO\ASSEMBLER\P3.X\RETARDOS.ASM
+
+
