@@ -26,7 +26,7 @@ IN1ci0t3cla4do  		; Subrutina de configuraci�n de Teclado. Activa las resisten
 banco 1           			;Vamos al banco 1
 MOVLW b'11110000' 	; Configuramos las columnas como salida y las filas como entrada
 MOVWF TRISB			;del puerto B.
-BCF OPTION_REG,NOT_RBPU		;Activa las resistencias tipo PULL-UP del pic
+BCF OPTION_REG,7		;Activa las resistencias tipo PULL-UP del pic
 banco 0           			;Regresamos al Banco 0
 CLRF tekl4pul5		;Limpiamos memorias de teclapulsada
 CLRF Sit3cl4pus		;Limpiamos permisos para bucles

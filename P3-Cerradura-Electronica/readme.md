@@ -11,14 +11,20 @@ clave de acceso; tanto el led verde como el rojo deben encender por un periodo d
 para dar tiempo al usuario de abrir la puerta o para que escuche el zumbido y vuelva a
 ingresar la clave.
 
+La clave escogida fue: 0626
+Sin embargo, puede ser cambiada por otra editando en el código.
 
 Esta práctica se realizó tanto en ASSEMBLER como en XC8. 
-El diseño con ASSEMBLER, la simulación presenta fallas al momento de introducir la clave, 
-pues no maneja muy bien el delay de antirebote. 
-En ocasiones cuando se presiona una tecla, el delay de antirebote no funciona correctamente y es posible que dicha
-tecla se pulse dos veces seguidas, ocasionando que se detecte una clave errónea. 
-Sin embargo, el circuito en físico no debería presentar esta falla pues 255 ms (delay para antirrebote) es
-bastante tiempo.
+El diseño con ASSEMBLER, la simulación presenta fallas al momento de
+introducir la clave, pues no maneja muy bien el delay de antirebote de 250ms.
+Cuando se presiona una tecla, el delay de antirebote no funciona correctamente y es posible
+que dicha tecla se pulse dos veces seguidas, ocasionando que se detecte una clave errónea.
+Por lo que hay que intentarlo varias veces. El circuito en físico no debería presentar esta falla
+pues 250 ms de delay es suficiente tiempo.
+Una posible solución a este problema en la simulación es colocar el delay de antirrebote a 1
+segundo. Sin embargo, esto requiere introducir el código de manera lenta (esperando
+aproximadamente 1 segundo entre cada pulsación de la tecla) para que se detecte de forma
+correcta.
 En cuanto a la simulación con XC8 (lenguaje C), ésta si funciona correctamente.
 
 ![alt text](./Circuito.PNG)

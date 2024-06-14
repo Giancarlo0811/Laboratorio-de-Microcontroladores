@@ -23,28 +23,33 @@ BCF PORTC, 2 ;buzzer inicialmente apagado
 iniciar_teclado ;Iniciamos el teclado matricial 4x4 (configuraciones)
 
 PROGRAMA
-    
+
 leertecla		;leemos 1ra tecla
 MOVWF teclapulsada      ;Guardamos la tecla pulsada en el registro 
 registrocdisplay teclapulsada ;Escribimos la teclapulsada en el display (catodo comun)
-milisegundo .255 ; delay antirebote
+segundo .1 ; delay antirebote
+; milisegundo .250 -- Delay para circuito físico (250 ms deberia ser suficiente)
     
 leertecla		;leemos 2da tecla
 MOVWF teclapulsada2      ;Guardamos la tecla pulsada en el registro 
 registrocdisplay teclapulsada2 ;Escribimos la teclapulsada en el display (catodo comun)
-milisegundo .255 ; delay antirebote
+segundo .1 ; delay antirebote para simulacion
+; milisegundo .250 -- Delay para circuito físico (250 ms deberia ser suficiente)
     
 leertecla		;leemos 3ra tecla
 MOVWF teclapulsada3      ;Guardamos la tecla pulsada en el registro 
 registrocdisplay teclapulsada3 ;Escribimos la teclapulsada en el display (catodo comun)
-milisegundo .255 ; delay antirebote 
+segundo .1 ; delay antirebote para simulacion
+; milisegundo .250 -- Delay para circuito físico (250 ms deberia ser suficiente)
     
 leertecla		;leemos 4ta tecla
 MOVWF teclapulsada4      ;Guardamos la tecla pulsada en el registro 
 registrocdisplay teclapulsada4 ;Escribimos la teclapulsada en el display (catodo comun)
-milisegundo .255 ; delay antirebote
-
+segundo .1 ; delay antirebote para simulacion.
+; milisegundo .250 -- Delay para circuito fisico (250 ms deberia ser suficiente)
+    
 ; ----------------------- Sección de la contraseña: 0626 --------------------
+; ------- la clave puede cambiarse por la que se desee --------------------
 csni teclapulsada,.0, DENEGADO ; Si al consultar la contraseña, 1 digito falla
 csni teclapulsada2,.6, DENEGADO ; automaticamente se irá a la subrutina
 csni teclapulsada3,.2, DENEGADO ; llamada denegado
